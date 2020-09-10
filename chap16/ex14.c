@@ -26,6 +26,7 @@ struct shape
     } u;
 } s;
 
+// a) calculate the area of the shape
 int area_of_shape(struct shape s);
 
 int main(void)
@@ -40,7 +41,7 @@ int main(void)
 
     printf("Which shape do you want to work with (0 for circle, 1 for rectangle): ");
     scanf(" %d", &s.shape_kind);
-    if (s.shape_kind != 0 || s.shape_kind != 1)
+    if (s.shape_kind < 0 || s.shape_kind > 1)
     {
         printf("Choose the shape via 0 or 1.\n");
         return 1;
@@ -49,7 +50,7 @@ int main(void)
     else if (s.shape_kind == 1)
     {
         printf("Whats the width/height of the rectangle are gonna be? ");
-        scanf("%d/%d", &s.u.rectangle.width, &s.u.rectangle.height);
+        scanf("%d %d", &s.u.rectangle.width, &s.u.rectangle.height);
         if (s.u.rectangle.width < 0 || s.u.rectangle.height < 0)
         {
             printf("These values must be positive, retry.\n");
