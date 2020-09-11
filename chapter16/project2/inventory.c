@@ -1,3 +1,8 @@
+// The task is to modify the given program, so that
+// the print operation displays the parts sorted by part number.
+// Using qsort for it.
+// Leaving all of the original comments intact, just adding the sorting function.
+
 /*********************************************************
  * From C PROGRAMMING: A MODERN APPROACH, Second Edition *
  * By K. N. King                                         *
@@ -29,6 +34,9 @@ void insert(void);
 void search(void);
 void update(void);
 void print(void);
+// qsort add but since we are using an array of structs, it needs to be modified
+void quicksort(struct part a[], int low, int high);
+int split(struct part a[], int low, int high);
 
 /**********************************************************
  * main: Prompts the user to enter an operation code,     *
@@ -159,6 +167,9 @@ void update(void)
  **********************************************************/
 void print(void)
 {
+  //calling qsort before printing
+  quicksort(inventory, 0, (num_parts - 1));
+
   int i;
 
   printf("Part Number   Part Name                  "
@@ -166,4 +177,35 @@ void print(void)
   for (i = 0; i < num_parts; i++)
     printf("%7d       %-25s%11d\n", inventory[i].number,
            inventory[i].name, inventory[i].on_hand);
+}
+
+// adding in qsort
+void quicksort( struct part a[], int low, int high)
+{
+  int middle;
+
+  if (low >= high) return;
+  middle = split(a, low, high);
+  quicksort(a, low, middle - 1);
+  quicksort(a, middle + 1, high);
+}
+
+int split(struct part a[], int low, int high)
+{
+  struct part part_element = a[low];
+
+  for (;;) {
+    while (low < high && part_element.number <= a[high].number)
+      high--;
+    if (low >= high) break;
+    a[low++] = a[high];
+
+    while (low < high && a[low].number <= part_element.number)
+      low++;
+    if (low >= high) break;
+    a[high--] = a[low];
+  }
+
+  a[high].number = part_element.number;
+  return high;
 }
