@@ -1,10 +1,5 @@
+// Modify delete_from_list function so that it uses one pointer instead of two.
 
-/*
-    Modify delete_from_list function so that it uses one pointer instead of two.
-    Thought process: I have the first node of the list, and i can use a pointer to traverse the list.
-    so theoretically I could store the position of the item I found and reloop to find the loop before it?
-    then link it to the node after it. but... it would still require two pointers.
-*/
 #include <stdio.h>
 #include <stdlib.h> //memory related stuff
 
@@ -14,8 +9,8 @@ struct node
     struct node *next; // Pointer to the next node
 };
 
-struct node *delete_from_list(struct node *list, int n);
-struct node *add_to_list(struct node *list, int n);
+void *delete_from_list(struct node **list, int n);
+void add_to_list(struct node **list, int n);
 void show_list(struct node *list);
 
 int main(void)
@@ -28,38 +23,39 @@ int main(void)
     scanf(" %d", &user_input);
     while (user_input != 0)
     {
-        start = add_to_list(start, user_input);
+        add_to_list(&start, user_input);
         scanf(" %d", &user_input);
     }
+    add_to_list(&start, 0);
+
+    printf("The linked list we have now is:");
+    show_list(start);
     printf("Enter a value you want to delete from the list: ");
     scanf("%d", &user_key);
-    start = delete_from_list(start, user_key);
-
+    delete_from_list(&start, user_key);
     printf("The linked list we have now is:");
     show_list(start);
 
     return 0;
 }
 
-struct node *delete_from_list(struct node *list, int n)
+void *delete_from_list(struct node **list, int n)
 {
-    struct node *current_node, *previous_node;
-    for (current_node = list, previous_node = NULL;
-         current_node != NULL && current_node->value != n;
-         previous_node = current_node, current_node->next)
-        ;
-
-    // if no node has the value we want
-    if (current_node == NULL)
-        return list;
-    // if n is in the first node the previous node will be NULL
-    if (previous_node == NULL)
-        return list->next;
-    // in other cases we can reappoint the previous node to the node right afte the one to be deleted:
-    else
-        previous_node->next = current_node->next;
-    free(current_node);
-    return list;
+    // The one and only node is going to point to the start pointer of the list.
+    struct node *ultimate_node = *list;
+    while (ultimate_node != NULL)
+    {
+        if (ultimate_node->value == n)
+        {
+            *list = ultimate_node->next;
+            free(ultimate_node);
+            break;
+        }
+        //Advancing the nodes if the current pointer isn't pointing to the search key.
+        // We need &ultimate_node since list is a double pointer so we gotta go all meta
+        list = &ultimate_node->next;
+        ultimate_node = ultimate_node->next;
+    }
 }
 
 void show_list(struct node *list)
@@ -74,7 +70,7 @@ void show_list(struct node *list)
     printf("\n");
 }
 
-struct node *add_to_list(struct node *list, int n)
+void add_to_list(struct node **list, int n)
 {
     struct node *fresh;
     fresh = malloc(sizeof(struct node));
@@ -82,6 +78,6 @@ struct node *add_to_list(struct node *list, int n)
         exit(EXIT_FAILURE);
 
     fresh->value = n;
-    fresh->next = list;
-    return fresh;
+    fresh->next = *list;
+    *list = fresh;
 }
