@@ -52,7 +52,7 @@ int main(void)
 struct node *add_to_linked_list(struct node *list, int n)
 {
     struct node *new_node;
-    new node = malloc(sizeof(struct node));
+    new_node = malloc(sizeof(struct node));
 
     if (new_node == NULL)
     {
